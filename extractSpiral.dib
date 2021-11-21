@@ -116,6 +116,19 @@ let mvY start _end x (arr: int[,]) =
 
 #!fsharp
 
+type Axis =
+    | X of position: int
+    | Y of position: int
+
+type Move =
+    | Horizontal of start:int * _end:int * Axis
+    | Vertical of start:int * _end:int * Axis
+
+let moveLeft start _end y = 
+    Horizontal(start, _end, Y(position = y))
+
+#!fsharp
+
 let extract (arr: int[,]) = 
     
     let mutable result: int[] = [||]
@@ -127,15 +140,15 @@ let extract (arr: int[,]) =
 
 
     for i = 0 to (length - 1) do 
-            lvl <- length - i
-            mvY i (lvl - 1) i arr // 1
-                |> appendRange                    
-            mvX i (lvl - 1) lvl arr // 2
-                |> appendRange 
-            mvY (lvl) (i + 1) lvl arr // 3
-                |> appendRange
-            mvX (lvl) (i + 1) i arr // 4
-                |> appendRange
+        lvl <- length - i
+        mvY i (lvl - 1) i arr // 1
+            |> appendRange                    
+        mvX i (lvl - 1) lvl arr // 2
+            |> appendRange 
+        mvY (lvl) (i + 1) lvl arr // 3
+            |> appendRange
+        mvX (lvl) (i + 1) i arr // 4
+            |> appendRange
     result.[0..arr.Length - 1]
 
 extract source2
