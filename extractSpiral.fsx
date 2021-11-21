@@ -19,6 +19,9 @@ let moveX start _end y (arr: int[,]) =
         [|for i = start to _end do
             arr.[i, y]|]
 
+let mvX start _end y (arr: int[,]) =
+    arr.[start .. _end, y]
+
 
 let moveY start _end x (arr: int[,]) =
     if start > _end then
@@ -28,6 +31,9 @@ let moveY start _end x (arr: int[,]) =
         [|for i = start to _end do
             arr.[x, i]|]
 
+let mvY start _end x (arr: int[,]) =
+    arr.[x, start .. _end]
+    
 let mutable counter = 0
                         
 let printResult (arr: int array) = 

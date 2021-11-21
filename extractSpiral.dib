@@ -1,3 +1,7 @@
+#!markdown
+
+first lets start by preparing a 2D array that we will use for our tests.
+
 #!fsharp
 
 open System
@@ -13,6 +17,10 @@ let source =
         [| 13; 12; 11; 10; 9 |];                                
     |]
 
+#!markdown
+
+now lets prepare some functions to print and increment processed items
+
 #!fsharp
 
 let mutable counter = 0
@@ -22,6 +30,10 @@ let printResult (arr: int array) =
 
 let incrementCounter amount = 
     counter <- counter + amount
+
+#!markdown
+
+now we need two method to move through the array and collect items for a specific dimension, omiting the last item
 
 #!fsharp
 
@@ -33,6 +45,23 @@ let moveX start _end y (arr: int[,]) =
         [|for i = start to _end do
             arr.[i, y]|]
 
+#!markdown
+
+Both these two blocks are identical, in that they simply loop through the array in a specific dimension the X, by keeping the Y axis static
+
+#!fsharp
+
+let reverse arr =
+    Array.rev arr
+let mvX start _end y (arr: int[,]) =
+    if start > _end then 
+        reverse arr.[_end .. start, y]
+    elif start < _end then  
+        arr.[start .. _end, y]
+    else  
+        [|arr.[start, y]|]
+
+#!fsharp
 
 let moveY start _end x (arr: int[,]) =
     if start > _end then
@@ -42,33 +71,55 @@ let moveY start _end x (arr: int[,]) =
         [|for i = start to _end do
             arr.[x, i]|]
 
+#!markdown
+
+Both these two blocks are identical, in that they simply loop through the array in a specific dimension the Y axis, by keeping the X axis static
+
+#!fsharp
+
+let mvY start _end x (arr: int[,]) =
+    if start > _end then 
+        reverse arr.[x, _end .. start]
+    elif start < _end then
+        arr.[x, start .. _end]
+    else 
+        [|arr.[x, start]|]
+
 #!fsharp
 
 let extract (arr: int[,]) = 
     
-    let mutable result: int[] = [||] // Array.CreateInstance(typeof<int>, int64(arr.Length) ) 
+    let mutable result: int[] = [||]
     let mutable length = (arr.GetUpperBound 1) 
     let mutable lvl = 0
+
+    let appendRange (range: int[]) =
+        for i in range do
+            if counter <= arr.Length then
+                result <- Array.append result.[0..result.Length - 1] [|i|]
+
+
     for i = 0 to (length - 1) do 
-        if counter < arr.Length then
             lvl <- length - i
-            moveY i (lvl - 1) i arr
+            mvY i (lvl - 1) i arr
                 |> fun res -> 
                     incrementCounter res.Length   
-                    result <- Array.append result res                    
-            moveX i (lvl - 1) lvl arr
+                    appendRange res                    
+            mvX i (lvl - 1) lvl arr
                 |> fun res -> 
                     incrementCounter res.Length
-                    result <- Array.append result res
-            moveY (lvl) (i + 1) lvl arr
+                    appendRange res
+            mvY (lvl) (i + 1) lvl arr
                 |> fun res -> 
                     incrementCounter res.Length                                
-                    result <- Array.append result res
-            moveX (lvl) (i + 1) i arr
+                    appendRange res
+            mvX (lvl) (i + 1) i arr
                 |> fun res -> 
                     incrementCounter res.Length
-                    result <- Array.append result res
+                    appendRange res
     result
 
 extract source
-// |> printfn "%A"
+|> fun result -> 
+    printfn "%A" result
+    result
