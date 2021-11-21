@@ -2,6 +2,10 @@ open System
 open System.Collections
 
 
+(*****************************************************************************
+
+*****************************************************************************)
+
 let source = 
     array2D [|
         [| 1; 2; 3; 4; 5 |];
@@ -10,6 +14,38 @@ let source =
         [| 14; 23; 22; 21; 8 |];
         [| 13; 12; 11; 10; 9 |];                                
     |]
+
+let source2 = 
+    array2D [|
+        [| 1; 2; 3; 4; 5; 6; 7 |];
+        [| 24; 25; 26; 27; 28; 29; 8 |];
+        [| 23; 40; 41; 42; 43; 30; 9 |];
+        [| 22; 39; 48; 49; 44; 31; 10 |];
+        [| 21; 38; 47; 46; 45; 32; 11 |];
+        [| 20; 37; 36; 35; 34; 33; 12 |];                                        
+        [| 19; 18; 17; 16; 15; 14; 13 |];                                        
+
+    |]
+(*****************************************************************************
+
+*****************************************************************************)
+                        
+let printResult (arr: int array) = 
+    Array.ForEach(arr, (fun v ->  printfn "%d" v))
+
+let reverse arr =
+    Array.rev arr
+
+(*****************************************************************************
+    ________________
+  Y |--|--|--|--|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+
+*****************************************************************************)
+
 
 let moveX start _end y (arr: int[,]) =
     if start > _end then
@@ -20,7 +56,23 @@ let moveX start _end y (arr: int[,]) =
             arr.[i, y]|]
 
 let mvX start _end y (arr: int[,]) =
-    arr.[start .. _end, y]
+    if start > _end then 
+        reverse arr.[_end .. start, y]
+    elif start < _end then  
+        arr.[start .. _end, y]
+    else  
+        [|arr.[start, y]|]
+
+(*****************************************************************************
+                  X
+    ________________
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|__|
+
+*****************************************************************************)
 
 
 let moveY start _end x (arr: int[,]) =
@@ -32,45 +84,76 @@ let moveY start _end x (arr: int[,]) =
             arr.[x, i]|]
 
 let mvY start _end x (arr: int[,]) =
-    arr.[x, start .. _end]
-    
-let mutable counter = 0
-                        
-let printResult (arr: int array) = 
-    Array.ForEach(arr, (fun v ->  printfn "%d" v))
+    if start > _end then 
+        reverse arr.[x, _end .. start]
+    elif start < _end then
+        arr.[x, start .. _end]
+    else 
+        [|arr.[x, start]|]
 
-let incrementCounter amount = 
-    counter <- counter + amount
+(*****************************************************************************
+
+*****************************************************************************)
 
 let extract (arr: int[,]) = 
     
-    let mutable result: int[] = [||] // Array.CreateInstance(typeof<int>, int64(arr.Length) ) 
+    let mutable result: int[] = [||]
     let mutable length = (arr.GetUpperBound 1) 
-    let mutable lvl = 0
-    for i = 0 to (length - 1) do 
-        if counter < arr.Length then
-            lvl <- length - i
-            moveY i (lvl - 1) i arr
-                |> fun res -> 
-                    printResult res
-                    incrementCounter res.Length   
-                    result <- Array.append result res                    
-            moveX i (lvl - 1) lvl arr
-                |> fun res -> 
-                    printResult res
-                    incrementCounter res.Length
-                    result <- Array.append result res
-            moveY (lvl) (i + 1) lvl arr
-                |> fun res -> 
-                    printResult res
-                    incrementCounter res.Length                                
-                    result <- Array.append result res
-            moveX (lvl) (i + 1) i arr
-                |> fun res -> 
-                    printResult res
-                    incrementCounter res.Length
-                    result <- Array.append result res
-    result
+    let mutable level = 0
 
-extract source
-// |> printfn "%A"
+    let appendToResult (range: int[]) =
+        result <- Array.append result range                
+
+
+    for i = 0 to (length - 1) do 
+            level <- length - i
+            mvY i (level - 1) i arr // 1
+                |> appendToResult                    
+            mvX i (level - 1) level arr // 2
+                |> appendToResult 
+            mvY (level) (i + 1) level arr // 3
+                |> appendToResult
+            mvX (level) (i + 1) i arr // 4
+                |> appendToResult
+    done
+    result.[0..arr.Length - 1]
+
+extract source2
+|> fun result -> 
+    printfn "%A" result
+    result
+(*
+1 -
+    ________________
+  Y |--|--|--|--|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+
+2 - 
+                 X
+    ________________
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|__|
+
+3 -
+    ________________
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+  Y |__|--|--|--|--|
+
+4 - 
+     X            
+    ________________
+    |__|__|__|__|__|
+    |--|__|__|__|__|
+    |--|__|__|__|__|
+    |--|__|__|__|__|
+    |--|__|__|__|__|
+*)

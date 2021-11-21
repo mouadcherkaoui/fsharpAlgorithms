@@ -37,13 +37,12 @@ now lets prepare some functions to print and increment processed items
 
 #!fsharp
 
-let mutable counter = 0
                         
 let printResult (arr: int array) = 
     Array.ForEach(arr, (fun v ->  printfn "%d" v))
 
-let incrementCounter amount = 
-    counter <- counter + amount
+let reverse arr =
+    Array.rev arr
 
 #!markdown
 
@@ -63,10 +62,17 @@ let moveX start _end y (arr: int[,]) =
 
 Both these two blocks are identical, in that they simply loop through the array in a specific dimension the X, by keeping the Y axis static
 
+```txt
+    ________________
+  Y |--|--|--|--|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+````
+
 #!fsharp
 
-let reverse arr =
-    Array.rev arr
 let mvX start _end y (arr: int[,]) =
     if start > _end then 
         reverse arr.[_end .. start, y]
@@ -88,6 +94,15 @@ let moveY start _end x (arr: int[,]) =
 #!markdown
 
 Both these two blocks are identical, in that they simply loop through the array in a specific dimension the Y axis, by keeping the X axis static
+```txt
+                  X
+    ________________
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|__|
+```
 
 #!fsharp
 
@@ -104,8 +119,8 @@ let mvY start _end x (arr: int[,]) =
 let extract (arr: int[,]) = 
     
     let mutable result: int[] = [||]
-    let mutable length = (arr.GetUpperBound 1) 
     let mutable lvl = 0
+    let mutable length = (arr.GetUpperBound 1) 
 
     let appendRange (range: int[]) =
         result <- Array.append result range                
@@ -113,13 +128,13 @@ let extract (arr: int[,]) =
 
     for i = 0 to (length - 1) do 
             lvl <- length - i
-            mvY i (lvl - 1) i arr
+            mvY i (lvl - 1) i arr // 1
                 |> appendRange                    
-            mvX i (lvl - 1) lvl arr
+            mvX i (lvl - 1) lvl arr // 2
                 |> appendRange 
-            mvY (lvl) (i + 1) lvl arr
+            mvY (lvl) (i + 1) lvl arr // 3
                 |> appendRange
-            mvX (lvl) (i + 1) i arr
+            mvX (lvl) (i + 1) i arr // 4
                 |> appendRange
     result.[0..arr.Length - 1]
 
@@ -127,3 +142,72 @@ extract source2
 |> fun result -> 
     printfn "%A" result
     result
+
+#!markdown
+
+```txt
+1 -
+    ________________
+  Y |--|--|--|--|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+
+2 - 
+                 X
+    ________________
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|--|
+    |__|__|__|__|__|
+
+3 -
+    ________________
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+    |__|__|__|__|__|
+  Y |__|--|--|--|--|
+
+4 - 
+     X            
+    ________________
+    |__|__|__|__|__|
+    |--|__|__|__|__|
+    |--|__|__|__|__|
+    |--|__|__|__|__|
+    |--|__|__|__|__|
+```
+
+#!html
+
+<table>
+   <tbody>
+      <tr>
+         <td>*></td>
+         <td>*></td>
+         <td>*></td>
+         <td><></td>         
+      </tr>
+      <tr>
+         <td><|></td>
+         <td></td>
+         <td></td>
+         <td><></td>         
+      </tr>
+      <tr>
+         <td><|></td>
+         <td></td>
+         <td></td>
+         <td><></td>         
+      </tr>
+      <tr>
+         <td><|></td>
+         <td><*</td>
+         <td><*</td>
+         <td><*</td>         
+      </tr>                 
+   </tbody>
+</table>
