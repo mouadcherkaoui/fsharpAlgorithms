@@ -17,6 +17,20 @@ let source =
         [| 13; 12; 11; 10; 9 |];                                
     |]
 
+let source2 = 
+    array2D [|
+        [| 1; 2; 3; 4; 5; 6; 7 |];
+        [| 24; 25; 26; 27; 28; 29; 8 |];
+        [| 23; 40; 41; 42; 43; 30; 9 |];
+        [| 22; 39; 48; 49; 44; 31; 10 |];
+        [| 21; 38; 47; 46; 45; 32; 11 |];
+        [| 20; 37; 36; 35; 34; 33; 12 |];                                        
+        [| 19; 18; 17; 16; 15; 14; 13 |];                                        
+
+    |]
+
+    
+
 #!markdown
 
 now lets prepare some functions to print and increment processed items
@@ -94,32 +108,22 @@ let extract (arr: int[,]) =
     let mutable lvl = 0
 
     let appendRange (range: int[]) =
-        for i in range do
-            if counter <= arr.Length then
-                result <- Array.append result.[0..result.Length - 1] [|i|]
+        result <- Array.append result range                
 
 
     for i = 0 to (length - 1) do 
             lvl <- length - i
             mvY i (lvl - 1) i arr
-                |> fun res -> 
-                    incrementCounter res.Length   
-                    appendRange res                    
+                |> appendRange                    
             mvX i (lvl - 1) lvl arr
-                |> fun res -> 
-                    incrementCounter res.Length
-                    appendRange res
+                |> appendRange 
             mvY (lvl) (i + 1) lvl arr
-                |> fun res -> 
-                    incrementCounter res.Length                                
-                    appendRange res
+                |> appendRange
             mvX (lvl) (i + 1) i arr
-                |> fun res -> 
-                    incrementCounter res.Length
-                    appendRange res
-    result
+                |> appendRange
+    result.[0..arr.Length - 1]
 
-extract source
+extract source2
 |> fun result -> 
     printfn "%A" result
     result
