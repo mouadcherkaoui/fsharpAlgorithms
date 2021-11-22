@@ -194,6 +194,85 @@ extract source2
     |--|__|__|__|__|
 ```
 
+#!csharp
+
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+
+enum Axis {
+    XAxis,
+    YAxis
+}
+
+#!csharp
+
+IEnumerable<int> collectItems(int[,] source, int start, int end, int position, Axis axis) {
+    var result = new int[Math.Abs(end - start)];        
+    if(start > end)
+        for (int i = start; i >= end; i--) {
+            switch (axis) {
+                case Axis.XAxis:
+                    Console.Write(source[i, position] + "; ");
+                    yield return source[i, position];
+                    break;
+                case Axis.YAxis:
+                    Console.Write(source[position, i] + "; ");            
+                    yield return source[position, i];
+                    break;   
+            }     
+        }
+    else
+        for (int i = start; i <= end; i++) {
+            switch (axis) {
+                case Axis.XAxis:
+                    Console.WriteLine(source[i, position]);
+                    yield return source[i, position];
+                    break;
+                case Axis.YAxis:
+                    Console.WriteLine(source[position, i]);            
+                    yield return source[position, i];
+                    break;   
+            }     
+        }    
+}
+
+#!csharp
+
+int[] ExtractSpiral(int[,] source) {
+    var resultToReturn = new List<int>();
+    for (int i = 0; i < source.GetLength(0) - 1 ; i++) {
+        var level = source.GetLength(0) - 1 - i;
+         resultToReturn.AddRange(
+             collectItems(source, i, level - 1, i, Axis.YAxis));
+        resultToReturn.AddRange(
+            collectItems(source, i, level - 1, level, Axis.XAxis)
+        );
+        resultToReturn.AddRange(
+            collectItems(source, level, i + 1, level, Axis.YAxis)
+        );
+        resultToReturn.AddRange(
+            collectItems(source, level, i + 1, i, Axis.XAxis)
+        );        
+    }
+    resultToReturn.RemoveRange(source.Length, resultToReturn.Count - source.Length);
+    return resultToReturn.ToArray();
+}
+
+var test = new int[,] {
+    { 1, 2, 3, 4 },
+    { 5, 6, 7, 8 },
+    { 9, 10, 11, 12 },
+    { 13, 14, 15, 16 }
+};
+
+var result = ExtractSpiral(test);
+
+foreach(var i in result) {
+    Console.Write("{0}; ",i);
+}
+
 #!html
 
 <table>
