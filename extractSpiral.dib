@@ -124,8 +124,27 @@ type Move =
     | Horizontal of start:int * _end:int * Axis
     | Vertical of start:int * _end:int * Axis
 
-let moveLeft start _end y = 
-    Horizontal(start, _end, Y(position = y))
+
+let moveHorizontal start _end y = 
+    Horizontal(start, _end, Y(y))
+
+let moveVertical start _end y =
+    Vertical(start, _end, Y(y))
+
+// let move input =
+//     match input with 
+//     | Horizontal (x1, x2, Y(y)) -> moveX x1 x2 y
+//     | Vertical (x1, x2, Y(y)) -> moveY x1 x2 y
+//     | _ -> None
+
+// let rec extract (arr: 'T[,]) (level: int) = 
+//     move Horizontal((arr.Length - level), (level - 1), Y(arr.Length - level)) |> ignore
+//     move Vertical((arr.Length - level), (level - 1), X(level)) |> ignore
+//     move Horizontal((level), (arr.Length - level + 1), Y(level)) |> ignore
+//     move Vertical((level), (arr.Length - level + 1), (arr.Length - level)) |> ignore
+//     extract arr (level - 1)
+
+// extract source2
 
 #!fsharp
 
@@ -214,11 +233,11 @@ IEnumerable<int> collectItems(int[,] source, int start, int end, int position, A
         for (int i = start; i >= end; i--) {
             switch (axis) {
                 case Axis.XAxis:
-                    Console.Write(source[i, position] + "; ");
+                    // Console.Write(source[i, position] + "; ");
                     yield return source[i, position];
                     break;
                 case Axis.YAxis:
-                    Console.Write(source[position, i] + "; ");            
+                    // Console.Write(source[position, i] + "; ");            
                     yield return source[position, i];
                     break;   
             }     
@@ -227,11 +246,11 @@ IEnumerable<int> collectItems(int[,] source, int start, int end, int position, A
         for (int i = start; i <= end; i++) {
             switch (axis) {
                 case Axis.XAxis:
-                    Console.WriteLine(source[i, position]);
+                    // Console.WriteLine(source[i, position]);
                     yield return source[i, position];
                     break;
                 case Axis.YAxis:
-                    Console.WriteLine(source[position, i]);            
+                    // Console.WriteLine(source[position, i]);            
                     yield return source[position, i];
                     break;   
             }     
@@ -267,7 +286,17 @@ var test = new int[,] {
     { 13, 14, 15, 16 }
 };
 
-var result = ExtractSpiral(test);
+var test2 = new int[,]  
+    {
+        { 1, 2, 3, 4, 5, 6, 7 },
+        { 24, 25, 26, 27, 28, 29, 8 },
+        { 23, 40, 41, 42, 43, 30, 9 },
+        { 22, 39, 48, 49, 44, 31, 10 },
+        { 21, 38, 47, 46, 45, 32, 11 },
+        { 20, 37, 36, 35, 34, 33, 12 },                                        
+        { 19, 18, 17, 16, 15, 14, 13 }                                        
+    };
+var result = ExtractSpiral(test2);
 
 foreach(var i in result) {
     Console.Write("{0}; ",i);
