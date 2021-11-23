@@ -228,33 +228,32 @@ enum Axis {
 #!csharp
 
 IEnumerable<int> collectItems(int[,] source, int start, int end, int position, Axis axis) {
-    var result = new int[Math.Abs(end - start)];        
-    if(start > end)
-        for (int i = start; i >= end; i--) {
-            switch (axis) {
-                case Axis.XAxis:
-                    // Console.Write(source[i, position] + "; ");
-                    yield return source[i, position];
-                    break;
-                case Axis.YAxis:
-                    // Console.Write(source[position, i] + "; ");            
-                    yield return source[position, i];
-                    break;   
-            }     
-        }
-    else
-        for (int i = start; i <= end; i++) {
-            switch (axis) {
-                case Axis.XAxis:
-                    // Console.WriteLine(source[i, position]);
-                    yield return source[i, position];
-                    break;
-                case Axis.YAxis:
-                    // Console.WriteLine(source[position, i]);            
-                    yield return source[position, i];
-                    break;   
-            }     
-        }    
+    var result = new int[Math.Abs(end - start)];
+    Func<int, int> stepFunc = 
+        start > end 
+        ? (i) => --i
+        : (i) => ++i;     
+        
+    Func<int, int, bool> stopPredicate = 
+        start > end 
+        ? (i, e) => i >= end
+        : (i, e) => i <= end;
+            
+    var i = start;
+    while (stopPredicate(i, end)) {
+        var j = i;
+        i = stepFunc(i);
+        switch (axis) {
+            case Axis.XAxis:
+                Console.WriteLine(source[j, position]);
+                yield return source[j, position];
+                break;
+            case Axis.YAxis:
+                Console.WriteLine(source[position, j]);            
+                yield return source[position, j];
+                break;   
+        }     
+    }    
 }
 
 #!csharp
@@ -301,6 +300,8 @@ var result = ExtractSpiral(test2);
 foreach(var i in result) {
     Console.Write("{0}; ",i);
 }
+
+result
 
 #!html
 
