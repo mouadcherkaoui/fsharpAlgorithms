@@ -258,22 +258,21 @@ IEnumerable<int> collectItems(int[,] source, int start, int end, int position, A
 
 int[] ExtractSpiral(int[,] source) {
     var resultToReturn = new List<int>();
-    for (int i = 0; i < source.GetLength(0) - 1 ; i++) {
-        var level = source.GetLength(0) - 1 - i;
+    var length = source.GetLength(0) - 1;
+    var levelsCount = (length / 2) + (length % 2);
+
+    for (int i = 0; i <= levelsCount; i++) {
+        var level = length - i;
          resultToReturn.AddRange(
              collectItems(source, i, level - 1, i, Axis.YAxis));
         resultToReturn.AddRange(
-            collectItems(source, i, level - 1, level, Axis.XAxis)
-        );
+            collectItems(source, i, level - 1, level, Axis.XAxis));
         resultToReturn.AddRange(
-            collectItems(source, level, i + 1, level, Axis.YAxis)
-        );
+            collectItems(source, level, i + 1, level, Axis.YAxis));
         resultToReturn.AddRange(
-            collectItems(source, level, i + 1, i, Axis.XAxis)
-        );        
+            collectItems(source, level, i + 1, i, Axis.XAxis));        
     }
-    resultToReturn.RemoveRange(source.Length, resultToReturn.Count - source.Length);
-    return resultToReturn.ToArray();
+    return resultToReturn.Take(source.Length).ToArray();
 }
 
 var test = new int[,] {
