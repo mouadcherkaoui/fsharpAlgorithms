@@ -245,11 +245,9 @@ IEnumerable<int> collectItems(int[,] source, int start, int end, int position, A
         i = stepFunc(i);
         switch (axis) {
             case Axis.XAxis:
-                Console.WriteLine(source[j, position]);
                 yield return source[j, position];
                 break;
             case Axis.YAxis:
-                Console.WriteLine(source[position, j]);            
                 yield return source[position, j];
                 break;   
         }     
